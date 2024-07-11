@@ -99,6 +99,10 @@ def make_playlist(client, results, show):
         client.playlist_add_items(playlist_id, [song['id']])
     print(f'Playlist {playlist_title} has been created')
 
+def request_url():
+    url = input('Enter the URL of the show: ')
+    return url
+
 def main(page):
     start_time = time.time()
     # Get the HTML and parse for show class
@@ -121,6 +125,5 @@ def main(page):
     print("--- %s seconds ---" % np_round(time.time() - start_time, 2))
 
 if __name__ == '__main__':
-    url = 'https://www.bbc.co.uk/sounds/play/m001zzyx' # Target URL for the BBC sounds page
+    url = request_url() # Target URL for the BBC sounds page
     main(url)
-
