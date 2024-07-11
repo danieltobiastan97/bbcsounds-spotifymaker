@@ -1,0 +1,17 @@
+#Virtual environment
+venv/
+.env/
+.venv/
+
+# Python-generated files
+__pycache__/
+*.pyc
+*.pyo
+*ipynb
+
+/bin
+/include
+/lib
+/share
+.cache
+*.json
