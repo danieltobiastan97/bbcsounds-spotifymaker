@@ -60,11 +60,11 @@ def parse_song_info(results):
 search_limit = 10
 
 """Get matches against the search engine"""
-def get_matches(show_track_list):
+def get_matches(client, show_track_list):
     matches = []
     for track in show_track_list:
         sample_song = f'{track.title} - {track.artist}'
-        results = sp.search(q=sample_song, limit=search_limit)
+        results = client.search(q=sample_song, limit=search_limit)
         check = parse_song_info(results) # list of candidate songs
         
         ratio_bank = []
