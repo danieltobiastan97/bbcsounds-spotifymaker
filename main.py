@@ -60,23 +60,27 @@ def parse_song_info(results):
 search_limit = 10
 
 """Get matches against the search engine"""
-def get_matches(client, show_track_list):
+def get_matches(show_track_list):
     matches = []
     for track in show_track_list:
         sample_song = f'{track.title} - {track.artist}'
-        results = client.search(q=sample_song, limit=search_limit)
-        check = parse_song_info(results)
+        results = sp.search(q=sample_song, limit=search_limit)
+        check = parse_song_info(results) # list of candidate songs
         
         ratio_bank = []
-        # go through each search result and calculate the score, use fuzz to get the similarity score, temporarily use token_sort_ratio
+        # go through each search result and calculate the score, # bad solution
         for candidate in check:
             check_str = f'{candidate["name"]}, {candidate["artists"]}'
             ratio1 = fuzz.token_sort_ratio(candidate['name'], track.title)
             ratio2 = fuzz.token_sort_ratio(candidate['artists'], track.artist)
-            ratio_bank.append((ratio1+ratio2)/2)
+            if ratio1 > 80 and ratio2 > 50: # filter out the bad matches
+                ratio_bank.append((ratio1+ratio2)/2)
         
-        # np argmax of the indx
-        index = ratio_bank.index(max(ratio_bank))
+        # np argmax of the indx, if there are matches, if not skip
+        if ratio_bank:
+            index = ratio_bank.index(max(ratio_bank))
+        else:
+            continue
         matches.append(check[index])
     return matches
 
@@ -99,10 +103,12 @@ def make_playlist(client, results, show):
         client.playlist_add_items(playlist_id, [song['id']])
     print(f'Playlist {playlist_title} has been created')
 
+"""Request the URL"""
 def request_url():
     url = input('Enter the URL of the show: ')
     return url
 
+"""Main function"""
 def main(page):
     start_time = time.time()
     # Get the HTML and parse for show class
@@ -117,13 +123,14 @@ def main(page):
 
     # Get the matches
     matches = get_matches(sp_client, show.track_list)
-    print(f'{len(matches)} matches ---> Done Matching')
+    print(f'{len(matches)}/{len(show.track_list)} matches ---> Done Matching')
 
     # Create the playlist
     make_playlist(sp_client, matches, show)
     print('Done')
     print("--- %s seconds ---" % np_round(time.time() - start_time, 2))
 
+"""Run the main function"""
 if __name__ == '__main__':
     url = request_url() # Target URL for the BBC sounds page
     main(url)
